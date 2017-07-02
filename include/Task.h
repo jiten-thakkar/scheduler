@@ -5,8 +5,14 @@
 
 Class Task {
   private:
-
+    static const std::string m_id;
   public:
+    Task(std::string id):m_id(id) {}
+
+    std::string getTaskId() {
+      return m_id;
+    }
+
     virtual std::vector<double> operation();
 };
 
