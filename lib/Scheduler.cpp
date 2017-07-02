@@ -7,18 +7,14 @@
 #include <vector>
 
 #include "Scheduler.h"
-#include "Schedule.h"
 
-#include "KompexSQLiteDatabase.h"
-#include "KompexSQLiteStatement.h"
-#include "KompexSQLiteException.h"
+#define log std::cout
 
 void Scheduler::init() {
-  m_taskDatabase = new Kompex::SQLiteDatabase(m_taskDBName, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
-  taskStmt = new Kompex::SQLiteStatement(m_taskDatabase);
+  m_schedulerDatabase = new Kompex::SQLiteDatabase(m_schedulerDBName, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
+  taskStmt = new Kompex::SQLiteStatement(m_schedulerDatabase);
   taskStmt->SqlStatement(taskCreateStatement);
-  m_dataDatabase = new Kompex::SQLiteDatabase(m_dataDBName, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
-  dataStmt = new Kompex::SQLiteStatement(m_dataDatabase);
+  dataStmt = new Kompex::SQLiteStatement(m_schedulerDatabase);
   dataStmt->SqlStatement(dataCreateStatement);
 }
 
@@ -28,16 +24,18 @@ bool Scheduler::createTask(Schedule* sch) {
     return false; 
   taskStmt->Sql(getTaskWhereId);
   taskStmt->BindString(1, sch->getTask()->getId());
+  taskStmt->Execute();
   if (taskStmt->GetDataCount() == 0) {
     taskStmt->FreeQuery();
-    taskStmt->SqlStatement(insertIntoTask);
+    taskStmt->Sql(insertIntoTask);
     taskStmt->BindString(1, sch->getTask()->getId());
     taskStmt->BindString(2, sch->getTask()->getDescription());
     taskStmt->ExecuteAndFree();
   } else {
     taskStmt->FreeQuery();
   }
-  std::thread fireSchedule(doTheDeeds, sch);
+  std::thread fireSchedule(&Scheduler::doTheDeeds, this, sch);
+  fireSchedule.detach();
   sch->setId(++m_taskCounter);
   m_scheduledTasks[sch->getTask()->getId()] = sch;
   return true;
@@ -56,7 +54,7 @@ bool Scheduler::cancelTask(std::string id) {
   //setting recurrance to false so that in the next execution
   //the task thread will exit
   m_scheduledTasks[id]->setRecurring(false);
-  m_scheduledTask.erase(m_scheduledTasks.find(id));
+  m_scheduledTasks.erase(m_scheduledTasks.find(id));
   return true;
 }
 
@@ -65,7 +63,7 @@ void Scheduler::doTheDeeds(Schedule* sch) {
   std::vector<double> avg(sch->getTask()->getNumberofMatrices(), 0);
   std::vector<double> max(sch->getTask()->getNumberofMatrices(), 0);
   dataStmt->Sql(getLatestDataWithTaskid);
-  dataStmt->BindString(1, sch->task->getId());
+  dataStmt->BindString(1, sch->getTask()->getId());
   if (dataStmt->GetDataCount() > 0) {
     while(dataStmt->FetchRow()) {
       int metricId = dataStmt->GetColumnInt(DATA_METRICID_COLUMN);
@@ -78,20 +76,20 @@ void Scheduler::doTheDeeds(Schedule* sch) {
   do {
     std::map<int, double> data = sch->getTask()->operation();
     for (auto& d : data) {
-      int metricId = d->first;
-      double data = d->second;
-      if (data < min[metricId])
+      int metricId = d.first;
+      double data = d.second;
+      if (data < min[metricId] || min[metricId] == 0)
         min[metricId] = data;
       if (data > max[metricId])
         max[metricId] = data;
       avg[metricId] = (data + avg[metricId])/2;
-      dataStmt->SqlStatement(insertIntoData);
+      dataStmt->Sql(insertIntoData);
       dataStmt->BindString(DATA_TASKID_COLUMN, sch->getTask()->getId());
       dataStmt->BindInt(DATA_METRICID_COLUMN, metricId);
-      dataStmt->BindDouble(DATA_VAL_COLUMN, val);
-      dataStmt->BindDouble(DATA_MIN_COLUMN, min);
-      dataStmt->BindDouble(DATA_AVG_COLUMN, avg);
-      dataStmt->BindDouble(DATA_MAX_COLUMN, max);
+      dataStmt->BindDouble(DATA_VAL_COLUMN, data);
+      dataStmt->BindDouble(DATA_MIN_COLUMN, min[metricId]);
+      dataStmt->BindDouble(DATA_AVG_COLUMN, avg[metricId]);
+      dataStmt->BindDouble(DATA_MAX_COLUMN, max[metricId]);
       dataStmt->ExecuteAndFree();
     }
     std::this_thread::sleep_for(std::chrono::seconds(sch->getFrequency()));

@@ -17,7 +17,7 @@ class Schedule {
       m_id = id;
     }
 
-    const task* getTask() {
+    const Task* getTask() {
       return m_task;
     }
 
@@ -30,12 +30,12 @@ class Schedule {
     }
 
     //returns next execution time in seconds since epoch
-    long getNextExecutionTime() {
+    /*long getNextExecutionTime() {
       using namespace std::chrono;
       system_clock::time_point tp = system_clock::now();
       seconds dtn = tp.time_since_epoch();
       return dtn.count() + m_frequency;
-    }
+    }*/
 
     long getFrequency() {
       return m_frequency;
@@ -45,11 +45,8 @@ class Schedule {
       m_frequency = frequency;
     }
 
-    const Task* getTask() {
-      return m_task;
-    }
   private:
-    const long m_id;
+    long m_id;
     Task* m_task;
     bool m_recurring;
     long m_frequency;

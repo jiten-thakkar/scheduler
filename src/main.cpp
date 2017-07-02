@@ -1,17 +1,22 @@
 #include <iostream>
+#include <thread>
 
 #include "Scheduler.h"
+#include "VirtualMemoryUsageTask.h"
+
+#define log std::cout
 
 int main() {
   try {
-    Scheduler* scheduler = new ;
-    sch->init();
-    Task* memoryTask = new VirtualMemoryUsageTask();
+    Scheduler* scheduler = new Scheduler();
+    scheduler->init();
+    log << "scheduler initiated\n";
+    VirtualMemoryUsageTask* memoryTask = new VirtualMemoryUsageTask();
     Schedule* memorySchedule = new Schedule(memoryTask, true, 5);
     if(!scheduler->createTask(memorySchedule)) {
       std::cout << "Memory task already scheduled.\n";
     } else {
-      std::cout << "Memory task schedulerd.\n";
+      std::cout << "Memory task scheduled.\n";
     }
     std::this_thread::sleep_for(std::chrono::seconds(15));
     if(!scheduler->modifyTaskFrequency(memoryTask->getId(), 10)) {
