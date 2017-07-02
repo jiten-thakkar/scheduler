@@ -5,8 +5,9 @@
 
 #include "Task.h"
 
-#define DATA_DB_NAME #data.db
-#define TASK_DB_NAME #task.db
+#define NAME(x) #x
+#define DATA_DB_NAME NAME(data.db)
+#define TASK_DB_NAME NAME(task.db)
 #define DATA_TASKID_COLUMN 1 
 #define DATA_METRICID_COLUMN 2 
 #define DATA_VAL_COLUMN 3

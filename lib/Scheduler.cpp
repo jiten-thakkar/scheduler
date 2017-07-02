@@ -9,12 +9,9 @@
 #include "Scheduler.h"
 #include "Schedule.h"
 
-#include "KompexSQLitePrerequisites.h"
 #include "KompexSQLiteDatabase.h"
 #include "KompexSQLiteStatement.h"
 #include "KompexSQLiteException.h"
-#include "KompexSQLiteStreamRedirection.h"
-#include "KompexSQLiteBlob.h"
 
 void Scheduler::init() {
   m_taskDatabase = new Kompex::SQLiteDatabase(m_taskDBName, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, 0);
