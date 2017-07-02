@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <thread>
+#include <map>
+#include <vector>
 
 #include "Scheduler.h"
 #include "Schedule.h"
@@ -27,6 +29,17 @@ bool Scheduler::createTask(Schedule* sch) {
   //return false if task has already been created
   if (m_scheduledTasks.find(sch->getTask()->getId()) != m_scheduledTasks.end())
     return false; 
+  taskStmt->Sql(getTaskWhereId);
+  taskStmt->BindString(1, sch->getTask()->getId());
+  if (taskStmt->GetDataCount() == 0) {
+    taskStmt->FreeQuery();
+    taskStmt->SqlStatement(insertIntoTask);
+    taskStmt->BindString(1, sch->getTask()->getId());
+    taskStmt->BindString(2, sch->getTask()->getDescription());
+    taskStmt->ExecuteAndFree();
+  } else {
+    taskStmt->FreeQuery();
+  }
   std::thread fireSchedule(doTheDeeds, sch);
   sch->setId(++m_taskCounter);
   m_scheduledTasks[sch->getTask()->getId()] = sch;
@@ -55,7 +68,7 @@ void Scheduler::doTheDeeds(Schedule* sch) {
   std::vector<double> avg(sch->getTask()->getNumberofMatrices(), 0);
   std::vector<double> max(sch->getTask()->getNumberofMatrices(), 0);
   dataStmt->Sql(getLatestDataWithTaskid);
-  dataStmt->BindString(0, sch->task->getId());
+  dataStmt->BindString(1, sch->task->getId());
   if (dataStmt->GetDataCount() > 0) {
     while(dataStmt->FetchRow()) {
       int metricId = dataStmt->GetColumnInt(DATA_METRICID_COLUMN);
@@ -84,7 +97,7 @@ void Scheduler::doTheDeeds(Schedule* sch) {
       dataStmt->BindDouble(DATA_MAX_COLUMN, max);
       dataStmt->ExecuteAndFree();
     }
-    std::this_thread::sleep_for (std::chrono::seconds(sch->getFrequency()));
+    std::this_thread::sleep_for(std::chrono::seconds(sch->getFrequency()));
   } while (sch->isRecurring());
 }
 
