@@ -16,9 +16,6 @@
 
 Class Scheduler {
   public:
-
-    //Scheduler(std::string dbName):m_dbName(dbName) {}
-
     void init();
     bool createTask(Schedule*);
     bool modifyTaskFrequency(long, int);
@@ -32,13 +29,19 @@ Class Scheduler {
     Kompex::SQLiteDatabase* m_dataDatabase;
     Kompex::SQLiteStatement* taskStmt;
     Kompex::SQLiteStatement* dataStmt;
-    const std::string taskCreateStatement("CREATE TABLE IF NOT EXISTS data (id VARCHAR(20) primary key, description TEXT");
-    const std::string dataCreateStatement("CREATE TABLE IF NOT EXISTS data (id integer primary key autoincrement, time timestamp default (strftime('%s', 'now')), FOREIGN KEY(taskid) REFERENCES task(id), metricid INTEGER NOT NULL, val DOUBLE NOT NULL, min DOUBLE NOT NULL, avg DOUBLE NOT NULL, max DOUBLE NOT NULL");
-    const std::string insertIntoData("INSERT INTO data (taskid, metricid, val, min, avg, max) VALUES (?, ?, ?, ?, ?, ?)");
+    const std::string taskCreateStatement("CREATE TABLE IF NOT EXISTS data (id VARCHAR(20) \
+      primary key, description TEXT");
+    const std::string dataCreateStatement("CREATE TABLE IF NOT EXISTS data (id integer primary \
+      key autoincrement, time timestamp default (strftime('%s', 'now')), FOREIGN KEY(taskid) \
+      REFERENCES task(id), metricid INTEGER NOT NULL, val DOUBLE NOT NULL, min DOUBLE NOT NULL, \
+      avg DOUBLE NOT NULL, max DOUBLE NOT NULL");
+    const std::string insertIntoData("INSERT INTO data (taskid, metricid, val, min, avg, max) \
+        VALUES (?, ?, ?, ?, ?, ?)");
     const std::string insertIntoTask("INSERT INTO task (id, description) VALUES (?, ?)");
     const std::string getTaskWhereId("SELECT * FROM task WHERE id=@taskid");
     const std::string getDataWhereTaskid("SELECT * FROM data WHERE taskid=@id");
-    const std::string getLatestDataWithTaskid("Select * FROM data WHERE taskid=@id ORDER BY time DESC LIMIT 1");
+    const std::string getLatestDataWithTaskid("Select * FROM data WHERE taskid=@id ORDER BY time \
+        DESC LIMIT 1");
 
     void doTheDeeds(Schedule*);
 };

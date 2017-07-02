@@ -7,7 +7,7 @@
 class Schedule {
   public:
     Schedule(Task* task, bool recurring, long frequency):m_task(task), 
-                                                                  m_recurring(recurring), m_frequency(frequency) {}
+      m_recurring(recurring), m_frequency(frequency) {}
 
     const long getId() {
       return m_id;
