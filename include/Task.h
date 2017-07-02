@@ -13,7 +13,7 @@ Class Task {
       return m_id;
     }
 
-    virtual std::vector<double> operation();
+    virtual std::map<int, double> operation();
 };
 
 #endif //TASK_H

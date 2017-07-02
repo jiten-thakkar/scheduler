@@ -51,26 +51,33 @@ bool Scheduler::cancelTask(std::string id) {
 }
 
 void Scheduler::doTheDeeds(Schedule* sch) {
-  double min = avg = max = 0;
+  std::vector<double> min(sch->getTask()->getNumberofMatrices(), 0);
+  std::vector<double> avg(sch->getTask()->getNumberofMatrices(), 0);
+  std::vector<double> max(sch->getTask()->getNumberofMatrices(), 0);
   dataStmt->Sql(getLatestDataWithTaskid);
   dataStmt->BindString(0, sch->task->getId());
-  assert(dataStmt->GetDataCount() <= 1 && "Query should have returned at max 1 raw of data");
   if (dataStmt->GetDataCount() > 0) {
-    min = dataStmt->GetColumnDouble(DATA_MIN_COLUMN);
-    avg = dataStmt->GetColumnDouble(DATA_AVG_COLUMN);
-    max = dataStmt->GetColumnDouble(DATA_MAX_COLUMN);
+    while(dataStmt->FetchRow()) {
+      int metricId = dataStmt->GetColumnInt(DATA_METRICID_COLUMN);
+      min[metricId] = dataStmt->GetColumnDouble(DATA_MIN_COLUMN);
+      avg[metricId] = dataStmt->GetColumnDouble(DATA_AVG_COLUMN);
+      max[metricId] = dataStmt->GetColumnDouble(DATA_MAX_COLUMN);
+    }
   }
   dataStmt->FreeQuery();
   do {
-    vector<double> data = sch->getTask()->operation();
+    std::map<int, double> data = sch->getTask()->operation();
     for (auto& d : data) {
-      if (d < min)
-        min = d;
-      if (d > max)
-        max = d;
-      avg = (d + avg)/2;
+      int metricId = d->first;
+      double data = d->second;
+      if (data < min[metricId])
+        min[metricId] = data;
+      if (data > max[metricId])
+        max[metricId] = data;
+      avg[metricId] = (data + avg[metricId])/2;
       dataStmt->SqlStatement(insertIntoData);
       dataStmt->BindString(DATA_TASKID_COLUMN, sch->getTask()->getId());
+      dataStmt->BindInt(DATA_METRICID_COLUMN, metricId);
       dataStmt->BindDouble(DATA_VAL_COLUMN, val);
       dataStmt->BindDouble(DATA_MIN_COLUMN, min);
       dataStmt->BindDouble(DATA_AVG_COLUMN, avg);
