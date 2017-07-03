@@ -13,7 +13,7 @@ cd scheduler
 git submodule init
 git submodule update
 cd dependency/kompex-sqlite-wrapper/
-./condifure && make
+./configure && make
 cd ../..
 mkdir build
 cd build
