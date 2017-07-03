@@ -12,7 +12,8 @@ steps for building the scheduler on Ubuntu:
 cd scheduler
 git submodule init
 git submodule update
-cd dependency/
+cd dependency/kompex-sqlite-wrapper/
+./condifure && make
 cd ../..
 mkdir build
 cd build
