@@ -4,8 +4,9 @@ A simple Scheduler service
 steps for building the scheduler:
 
 ```
-clone the repository
 install sqlite3 library
+clone the repository
+cd scheduler
 git submodule init
 git submodule update
 cd dependency/
