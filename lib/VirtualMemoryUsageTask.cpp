@@ -8,6 +8,7 @@
 std::map<int, double> VirtualMemoryUsageTask::operation() const {
   std::map<int, double> result;
   struct sysinfo memInfo;
+  //getting system info
   sysinfo (&memInfo);
   double totalVirtualMem = memInfo.totalram;
   totalVirtualMem += memInfo.totalswap;

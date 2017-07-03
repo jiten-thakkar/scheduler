@@ -62,6 +62,7 @@ int main() {
 
 
     free(memorySchedule);
+    free(tcpSchedule);
     free(memoryTask);
     free(tcpTask);
     free(scheduler); 

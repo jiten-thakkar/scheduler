@@ -10,8 +10,6 @@
 #include <netdb.h>
 #include <time.h>
 
-#define BUFSIZE 1024
-
 static const char* hostName = "www.google.com";
 static const int portNo = 80;
 
@@ -25,18 +23,18 @@ std::map<int, double> TCPTimeTask::operation() const {
   struct sockaddr_in serveraddr;
   struct hostent *server;
 
-  /* socket: create the socket */
+  //socket: create the socket 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0)
     error("ERROR opening socket");
 
-  /* gethostbyname: get the server's DNS entry */
+  //gethostbyname: get the server's DNS entry
   server = gethostbyname(hostName);
   if (server == NULL) {
     fprintf(stderr,"ERROR, no such host as %s\n", hostName);
   }
 
-  /* build the server's Internet address */
+  //build the server's Internet address
   bzero((char *) &serveraddr, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   bcopy((char *)server->h_addr,
