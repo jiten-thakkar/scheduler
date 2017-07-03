@@ -24,6 +24,6 @@ std::map<int, double> VirtualMemoryUsageTask::operation() const {
 
 const std::string VirtualMemoryUsageTask::id = "cd012a52-e59e-446e-a476-1d5b95af87af";
 
-const std::string VirtualMemoryUsageTask::m_description = "Task to collect data about total virtual memory and virtual memory being used.";
+const std::string VirtualMemoryUsageTask::m_description = "Task to collects data about total virtual memory and virtual memory being used.";
     
 const int VirtualMemoryUsageTask::m_numberof_metrices = 2;

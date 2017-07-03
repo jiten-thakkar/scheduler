@@ -23,8 +23,10 @@ add_library(Scheduler STATIC
   include/Schedule.h
   include/Task.h
   include/VirtualMemoryUsageTask.h
+  include/TCPTimeTask.h
   lib/Scheduler.cpp
   lib/VirtualMemoryUsageTask.cpp
+  lib/TCPTimeTask.cpp
   )
 
 add_library(sqlite-wrapper STATIC IMPORTED) # or STATIC instead of SHARED
