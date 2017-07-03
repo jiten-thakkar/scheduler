@@ -5,7 +5,7 @@
 
 class Task {
   private:
-    const std::string m_id;
+    const std::string m_id; //provide unique GUID for the task
     const std::string m_description;
     const int m_numberof_matrices;
   public:

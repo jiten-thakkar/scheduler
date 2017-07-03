@@ -29,12 +29,16 @@ class Scheduler {
     bool modifyTaskFrequency(std::string, long);
     bool cancelTask(std::string);
   private:
+    //map that stores references to scheduled tasks currently
     std::map<std::string, Schedule*> m_scheduledTasks;
+    //counter which keeps track of the number of tasks scheduled
     long m_taskCounter=0;
     const std::string m_schedulerDBName = SCHEDULER_DB_NAME;
     Kompex::SQLiteDatabase* m_schedulerDatabase;
     Kompex::SQLiteStatement* taskStmt;
     Kompex::SQLiteStatement* dataStmt;
+
+    //All the SQL queries necessary
     const std::string taskCreateStatement = "CREATE TABLE IF NOT EXISTS task (id VARCHAR(255) \
       primary key, description VARCHAR(255))";
     const std::string dataCreateStatement = "CREATE TABLE IF NOT EXISTS data (id integer primary \
@@ -46,8 +50,9 @@ class Scheduler {
     const std::string insertIntoTask = "INSERT INTO task (id, description) VALUES (?, ?)";
     const std::string getTaskWhereId = "SELECT * FROM task WHERE id=@taskid";
     const std::string getDataWhereTaskid = "SELECT * FROM data WHERE taskid=@id";
-    const std::string getLatestDataWithTaskid = "Select * FROM data WHERE taskid=@id ORDER BY time \
-        DESC LIMIT 1";
+    const std::string getLatestDataWithTaskid = "Select * FROM data AS d1 WHERE taskid=@id AND d1.time = \
+                                                 (SELECT MAX(time) FROM data AS d2 WHERE d1.metricid = d2.metricid\
+                                                  and d1.taskid = d2.taskid)";
 
     void doTheDeeds(Schedule*);
 };

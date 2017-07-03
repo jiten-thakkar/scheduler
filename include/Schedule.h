@@ -29,14 +29,6 @@ class Schedule {
       m_recurring = recurring;
     }
 
-    //returns next execution time in seconds since epoch
-    /*long getNextExecutionTime() {
-      using namespace std::chrono;
-      system_clock::time_point tp = system_clock::now();
-      seconds dtn = tp.time_since_epoch();
-      return dtn.count() + m_frequency;
-    }*/
-
     long getFrequency() {
       return m_frequency;
     }
