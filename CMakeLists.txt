@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1.0)
 
 project(GenericScheduler)
 
@@ -40,6 +40,5 @@ add_executable(example
   )
 
 find_package(Threads REQUIRED)
-#find_package(sqlite3 REQUIRED)
 
 target_link_libraries(example Scheduler sqlite-wrapper Threads::Threads sqlite3)
